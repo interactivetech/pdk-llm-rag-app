@@ -11,9 +11,9 @@ hyperparameters:
     warmup_steps: 3
     gradient_accumulation_steps: 1
     # dataset_name: 'PDS2'
-    model_path: '/nvmefs1/andrew.mendez/mistral_instruct_model_and_tokenizer'
-    tokenizer_path: '/nvmefs1/andrew.mendez/mistral_instruct_tokenizer/'
-    finetune_results_dir: '/nvmefs1/andrew.mendez/mistral_ckpt/mistral_model'
+    model_path: '/run/determined/workdir/shared_fs/cache/model/mistral_7b_model_tokenizer'
+    tokenizer_path: '/run/determined/workdir/shared_fs/cache/model/mistral_7b_model_tokenizer'
+    finetune_results_dir: '/run/determined/workdir/shared_fs/cache/mistral_ckpt/mistral_model'
     dataset_name: 'hpe_press_release'
 bind_mounts:
   - container_path: /nvmefs1/

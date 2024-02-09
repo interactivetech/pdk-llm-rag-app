@@ -20,3 +20,8 @@ We use the following stack:
 # How to Run
 * Run `Deploy RAG with PDK.pynb` to deploy a RAG system using a pretrained LLM
 * Run `Finetune and Deploy RAG with PDK.ipynb` to both finetune an LLM and deploy a finetuned model.
+
+# Installation Steps
+Make sure you have a PDK deployment with a shared file directory
+
+`/run/determined/workdir/shared_fs/cache`
