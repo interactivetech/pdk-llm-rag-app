@@ -15,13 +15,29 @@ We use the following stack:
 
 # Pre-requisite
 * This Demo requires running with an A100 80GB GPU.
+* This demo currently only supports deployment and running on the Houston Cluster
 * This Demo assumes you have pachyderm and determined installed on top of kubernetes. A guide will be provided soon to show how to install pachyderm and kubernetes.
+* If you have a machine with GPUs, you can install PDK using this guide: https://github.com/interactivetech/pdk-install
+* [Coming soon] We will modify the installation steps to also support installation on a PDK GCP cluster
 
 # How to Run
 * Run `Deploy RAG with PDK.pynb` to deploy a RAG system using a pretrained LLM
 * Run `Finetune and Deploy RAG with PDK.ipynb` to both finetune an LLM and deploy a finetuned model.
 
 # Installation Steps
+Make sure you have a PDK deployment with a shared file directory `/nvmefs1/test_user`
+
+Create directory: `mkdir -p /nvmefs1/test_user`
+
+# Update 
+
+## Install Determined Notebook template to use all the required python libraries to run
+change directory to the directory of this project, and run the command 
+
+`det template create pdk-llm-rag-env env/pdk-llm-nb-env.yaml`
+
+next, create Notebook with No GPUs, or One GPU
+
 Make sure you have a PDK deployment with a shared file directory
 
-`/run/determined/workdir/shared_fs/cache`
+mkdir /run/determined/workdir/shared_fs/cache
