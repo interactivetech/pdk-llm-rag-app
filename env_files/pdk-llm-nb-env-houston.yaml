@@ -1,0 +1,55 @@
+bind_mounts:
+- container_path: /run/determined/workdir/shared_fs
+  host_path: /nvmefs1/shared_nb
+  propagation: rprivate
+  read_only: false
+- container_path: /determined_shared_fs
+  host_path: /nvmefs1/determined/checkpoints
+  propagation: rprivate
+  read_only: false
+debug: false
+description: Environment to run PDK for LLM RAG Demo
+entrypoint:
+- /run/determined/jupyter/notebook-entrypoint.sh
+environment:
+  add_capabilities: null
+  drop_capabilities: null
+  environment_variables: {}
+  force_pull_image: false
+  image:
+    cpu: mendeza/mistral-rag-env:0.0.11-pachctl
+    cuda: mendeza/mistral-rag-env:0.0.11-pachctl
+    rocm: mendeza/mistral-rag-env:0.0.11-pachctl
+  pod_spec:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      creationTimestamp: null
+    spec:
+      containers:
+      - name: determined-container
+        resources:
+          limits:
+            rdma/rdma_shared_device_a: '1'
+            rdma/rdma_shared_device_b: '3'
+          requests:
+            rdma/rdma_shared_device_a: '1'
+            rdma/rdma_shared_device_b: '3'
+        volumeMounts:
+        - mountPath: /nvmefs1
+          name: sharedpfss
+      volumes:
+      - hostPath:
+          path: /nvmefs1
+          type: Directory
+        name: sharedpfss
+    status: {}
+  ports: null
+  proxy_ports: null
+idle_timeout: null
+notebook_idle_type: kernels_or_terminals
+pbs: {}
+slurm: {}
+work_dir: null
+workspace: Solution Engineering
+
