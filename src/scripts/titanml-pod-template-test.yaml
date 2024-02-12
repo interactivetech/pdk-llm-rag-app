@@ -29,7 +29,7 @@ spec:
     - effect: NoSchedule
       key: accelerator
       operator: Equal
-      value: Tesla-T4
+      value: {{GPU_DEVICE}}
   volumes:
   - name: host-volume
     hostPath:

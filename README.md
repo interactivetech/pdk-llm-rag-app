@@ -86,35 +86,11 @@ Code to run to download mistral 7B model
 
 `env/Download_Vector_Embedding.ipynb`
 
-# Modify `Deploy RAG with PDK.ipynb` notebook
+# Get IPs to deploy RAG Application.
 
-This notebook allows SE's to drive how to continuosly update a vector database with new documents.
+We need two IP Addresses that will allocate on the Houston Kubernetes Cluster. One IP will be used to deploy the TitanML API Service, and the user will deploy the user interface.
 
-## There are two data repos:
-* code: this is the repo that has all your code for preprocessing, training, and deployment. Code can be shown in the `src/` folder
-* data: this includes all the raw XML files that contain HPE press releases
 
-## Overview of pipelines we will deploy:
-* **process_xml**: This runs `src/py/process_xmls.py` script to extract the text from the raw xml files, and save them into `/pfs/out/hpe_press_releases.csv`
-* **add_to_vector_db**: This runs `src/py/seed.py` that takes `hpe_press_releases.csv` as input and indexes it to the vector database. NOTE: We are persisting the vector db as a folder in the directory you created `/nvmefs1/test_user/cache/rag_db/`
-* **deploy**: This runs a runner script `src/scripts/generate_titanml_and_ui_pod_check.sh`. This script deploys the LLM located at `/nvmefs1/test_user/cache/model/mistral_7b_model_tokenizer` to TitanML. TitanML does some efficient optimization so that models only uses 8.4GB on a GPU. 
-
-### Modify the **add_to_vector_db** pipline
-The **process_xml** pipeline does not have to be modified. We will need to modify the **add_to_vector_db** pipeline yaml definition.
-
-In jupyter notebook cell, make sure you modify te --path-to-db to the correct location:
-```yaml
-transform:
-    image: mendeza/python38_process:0.2
-    cmd: 
-        - '/bin/sh'
-    stdin: 
-    - 'python /pfs/code/src/py/seed.py --path_to_db /nvmefs1/test_user/cache/rag_db/
-    --csv_path /pfs/process_xml/hpe_press_releases.csv
-    --emb_model_path /run/determined/workdir/shared_fs/cache/vector_model/all-MiniLM-L6-v2'
-    - 'echo "$(openssl rand -base64 12)" > /pfs/out/random_file.txt'
-```
-### Test to see what next IPs are available.
 
 #### Get the first IP
 you will need two dedicated IPs that can persist on the houston cluster. Here are the steps I recommend running to make sure you can get IPs to use for the cluster. 
@@ -217,6 +193,36 @@ Clean up pods and svcs
 ```bash
 kubectl delete pod/jupyter1 && kubectl delete pod/jupyter2 && kubectl delete svc/jupyter1 && kubectl delete svc/jupyter2
 ```
+
+# Modify `Deploy RAG with PDK.ipynb` notebook
+
+This notebook allows SE's to drive how to continuosly update a vector database with new documents.
+
+## There are two data repos:
+* code: this is the repo that has all your code for preprocessing, training, and deployment. Code can be shown in the `src/` folder
+* data: this includes all the raw XML files that contain HPE press releases
+
+## Overview of pipelines we will deploy:
+* **process_xml**: This runs `src/py/process_xmls.py` script to extract the text from the raw xml files, and save them into `/pfs/out/hpe_press_releases.csv`
+* **add_to_vector_db**: This runs `src/py/seed.py` that takes `hpe_press_releases.csv` as input and indexes it to the vector database. NOTE: We are persisting the vector db as a folder in the directory you created `/nvmefs1/test_user/cache/rag_db/`
+* **deploy**: This runs a runner script `src/scripts/generate_titanml_and_ui_pod_check.sh`. This script deploys the LLM located at `/nvmefs1/test_user/cache/model/mistral_7b_model_tokenizer` to TitanML. TitanML does some efficient optimization so that models only uses 8.4GB on a GPU. 
+
+### Modify the **add_to_vector_db** pipline
+The **process_xml** pipeline does not have to be modified. We will need to modify the **add_to_vector_db** pipeline yaml definition.
+
+In jupyter notebook cell, make sure you modify te --path-to-db to the correct location:
+```yaml
+transform:
+    image: mendeza/python38_process:0.2
+    cmd: 
+        - '/bin/sh'
+    stdin: 
+    - 'python /pfs/code/src/py/seed.py --path_to_db /nvmefs1/test_user/cache/rag_db/
+    --csv_path /pfs/process_xml/hpe_press_releases.csv
+    --emb_model_path /run/determined/workdir/shared_fs/cache/vector_model/all-MiniLM-L6-v2'
+    - 'echo "$(openssl rand -base64 12)" > /pfs/out/random_file.txt'
+```
+
 ### Modify the **src/scripts/generate_titanml_and_ui_pod_check.sh** script
 
 go to `src/scripts/generate_titanml_and_ui_pod_check.sh` and modify several variables so it doesnt conflict with current deployment, and  

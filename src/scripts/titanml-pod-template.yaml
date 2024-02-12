@@ -19,9 +19,9 @@ spec:
     - containerPort: {{API_PORT}}
       hostPort: {{API_PORT}}
     volumeMounts:
-    - name: host-volume
+    - name: titanml-cache
       mountPath: /code/models/
-    - name: host-volume2
+    - name: host-volume
       mountPath: /nvmefs1/
     resources:
       limits:
@@ -30,14 +30,14 @@ spec:
     - effect: NoSchedule
       key: accelerator
       operator: Equal
-      value: Tesla-T4
+      value: {{GPU_DEVICE}}
   volumes:
+  - name: titanml-cache
+    hostPath:
+      path: {{LOCAL_TITANML_CACHE}}
   - name: host-volume
     hostPath:
-      path: {{HOST_VOLUME}}
-  - name: host-volume2
-    hostPath:
-      path: {{HOST_VOLUME2}}
+      path: {{LOCAL_VOLUME}}
 ---
 apiVersion: v1
 kind: Service

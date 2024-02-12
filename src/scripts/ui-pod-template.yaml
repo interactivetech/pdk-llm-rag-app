@@ -26,10 +26,10 @@ spec:
   volumes:
   - name: host-volume
     hostPath:
-      path: {{HOST_VOLUME}}
+      path: {{LOCAL_VOLUME}}
   - name: embed-cache
     hostPath:
-      path: {{EMBED_CACHE}}
+      path: {{LOCAL_EMBED_CACHE}}
 ---
 apiVersion: v1
 kind: Service
