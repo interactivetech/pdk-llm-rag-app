@@ -115,6 +115,8 @@ transform:
     - 'echo "$(openssl rand -base64 12)" > /pfs/out/random_file.txt'
 ```
 ### Test to see what next IPs are available.
+
+#### Get the first IP
 you will need two dedicated IPs that can persist on the houston cluster. Here are the steps I recommend running to make sure you can get IPs to use for the cluster. 
 
 ```bash
@@ -145,10 +147,76 @@ EOF
 Once this is running, then run the command to assign the next available IP
 
 ```bash
-x
+kubectl expose pod jupyter1 --port 8080 --target-port 8080 --type LoadBalancer
 ```
 
-Then 
+Then run this command:
+```bash
+kubectl get svc jupyter1
+```
+
+And see the output:
+```bash
+[andrew@mlds-mgmt ~]$ kubectl get svc jupyter1
+NAME       TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+jupyter1   LoadBalancer   10.43.186.18   10.182.1.51   8080:31685/TCP   5s
+```
+
+We see that the ip address `10.182.1.51` is allocated, so save this IP address for the TitanML deployment. 
+
+#### Get the Second IP for the User Interface Pod
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jupyter2
+  labels:
+    name: jupyter2
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu:latest
+    command: ["/bin/sh", "-c"]
+    args:
+      - echo starting;
+        apt-get update;
+        apt-get install -y python3 python3-pip;
+        pip install jupyterlab;
+        jupyter lab --ip=0.0.0.0 --port=8080 --NotebookApp.token='' --NotebookApp.password='' --allow-root
+    ports:
+    - containerPort: 8080
+      hostPort: 8080
+EOF
+```
+
+Once this is running, then run the command to assign the next available IP
+
+```bash
+kubectl expose pod jupyter2 --port 8080 --target-port 8080 --type LoadBalancer
+```
+
+Then run this command:
+```bash
+kubectl get svc jupyter2
+```
+
+And see the output:
+```bash
+[andrew@mlds-mgmt ~]$ kubectl get svc jupyter2
+NAME       TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+jupyter2   LoadBalancer   10.43.131.94   10.182.1.54   8080:31934/TCP   4s
+```
+We see that the ip address `10.182.1.54` is allocated, so save this IP address for the TitanML deployment. 
+
+So we will use `10.182.1.51` for TitanML deployment, and `10.182.1.54` for the user interface deployment. 
+
+Clean up pods and svcs
+
+```bash
+kubectl delete pod/jupyter1 && kubectl delete pod/jupyter2 && kubectl delete svc/jupyter1 && kubectl delete svc/jupyter2
+```
 ### Modify the **src/scripts/generate_titanml_and_ui_pod_check.sh** script
 
 go to `src/scripts/generate_titanml_and_ui_pod_check.sh` and modify several variables so it doesnt conflict with current deployment, and  
