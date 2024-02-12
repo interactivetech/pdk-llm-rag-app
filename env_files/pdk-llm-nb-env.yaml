@@ -1,0 +1,7 @@
+description: pdk-llm-rag-template
+environment:
+  image:
+    cpu: mendeza/mistral-rag-env:0.0.11-pachctl
+    cuda: mendeza/mistral-rag-env:0.0.11-pachctl
+resources:
+  slots_per_trial: 1
