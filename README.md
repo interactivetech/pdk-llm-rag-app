@@ -78,6 +78,10 @@ To prevent any interruption downloading, we will create a separate cache folder 
 (We can delete this after successfully saving)
 ` mkdir -p  /nvmefs1/test_user/cache/model_cache/mistral_7b_model_tokenizer`
 
+Finally, create a directory for the titanml cache:
+
+`mkdir -p /nvmefs1/test_user/cache/titanml_cache`
+
 Code to run to download vector db
 
 `env/Download_Vector_Embedding.ipynb`
@@ -225,7 +229,34 @@ transform:
 
 ### Modify the **src/scripts/generate_titanml_and_ui_pod_check.sh** script
 
-go to `src/scripts/generate_titanml_and_ui_pod_check.sh` and modify several variables so it doesnt conflict with current deployment, and  
+go to `src/scripts/deploy_app_v2.sh` and modify several variables so it aligns with the current location of 
+```bash
+ROOT_DIR=/pfs/code/src/scripts/
+# TITANML_POD_NAME is the name of the titanml pod we are deploying
+TITANML_POD_NAME=titanml-pod
+# TITANML_CACHE_HOST is the directory of the cache titanml needs during deployment
+TITANML_CACHE_HOST=/nvmefs1/test_user/cache/titanml_cache
+# HOST_VOLUME is the path to the root mounted directory
+HOST_VOLUME=/nvmefs1/
+# TAKEOFF_MODEL_NAME is the local path of a huggingface model titanml will optimize and deploy
+TAKEOFF_MODEL_NAME=/nvmefs1/andrew.mendez/mistral_instruct_model_and_tokenizer/
+# TAKEOFF_DEVICE specifys to use GPU Acceleration for TitanML
+TAKEOFF_DEVICE=cuda
+API_PORT=8080
+API_HOST=10.182.1.48
+UI_POD_NAME=ui-pod
+UI_PORT=8080
+# DB_PATH is the path to the chromadb vector database
+DB_PATH=/nvmefs1/test_user/cache/rag_db/
+UI_IP=10.182.1.50
+CHROMA_CACHE_HOST=/nvmefs1/andrew.mendez/chromadb_cache
+
+EMB_PATH=/nvmefs1/test_user/cache/vector_model/all-MiniLM-L6-v2
+# APP_PY_PATH is the python path used to the python script that implements the UI
+# Use /nvmefs1/ if you want fast debugging
+APP_PY_PATH="/nvmefs1/shared_nb/01 - Users/andrew.mendez/2024/pdk-llm-rag-demo-test-/src/py/app.py"
+# APP_PY_PATH="/pfs/out/app.py"
+```
 
 
 Make sure in add_to_vector_db pipeline, 

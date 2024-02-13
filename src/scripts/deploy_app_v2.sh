@@ -6,7 +6,7 @@ ROOT_DIR=/pfs/code/src/scripts/
 # TITANML_POD_NAME is the name of the titanml pod we are deploying
 TITANML_POD_NAME=titanml-pod
 # TITANML_CACHE_HOST is the directory of the cache titanml needs during deployment
-TITANML_CACHE_HOST=/nvmefs1/andrew.mendez/titanml_cache
+TITANML_CACHE_HOST=/nvmefs1/test_user/cache/titanml_cache
 # HOST_VOLUME is the path to the root mounted directory
 HOST_VOLUME=/nvmefs1/
 # TAKEOFF_MODEL_NAME is the local path of a huggingface model titanml will optimize and deploy
@@ -18,13 +18,15 @@ API_HOST=10.182.1.48
 UI_POD_NAME=ui-pod
 UI_PORT=8080
 # DB_PATH is the path to the chromadb vector database
-DB_PATH=/nvmefs1/andrew.mendez/rag_db/
+DB_PATH=/nvmefs1/test_user/cache/rag_db/
 UI_IP=10.182.1.50
-EMBED_CACHE_HOST=/nvmefs1/andrew.mendez/chromadb_cache
+CHROMA_CACHE_HOST=/nvmefs1/andrew.mendez/chromadb_cache
+
+EMB_PATH=/nvmefs1/andrew.mendez/chromadb_cache/all-MiniLM-L6-v2
 # APP_PY_PATH is the python path used to the python script that implements the UI
 # Use /nvmefs1/ if you want fast debugging
-APP_PY_PATH="/nvmefs1/shared_nb/01 - Users/andrew.mendez/2024/pdk-llm-rag-demo-houston-t4/src/py/app.py"
-# APP_PY_PATH="/pfs/out/src/py/app.py"
+APP_PY_PATH="/nvmefs1/shared_nb/01 - Users/andrew.mendez/2024/pdk-llm-rag-demo-test-/src/py/app.py"
+# APP_PY_PATH="/pfs/out/app.py"
 
 # GPU_DEVICE=Tesla-T4
 GPU_DEVICE=A100-MLDM
@@ -44,7 +46,7 @@ else
        -e "s|{{API_HOST}}|$API_HOST|g" \
        -e "s|{{TAKEOFF_DEVICE}}|$TAKEOFF_DEVICE|g" \
        -e "s|{{GPU_DEVICE}}|$GPU_DEVICE|g" \
-       "$ROOT_DIR"/titanml-pod-template.yaml > "$ROOT_DIR"/titanml-pod-runner.yaml
+       "$ROOT_DIR"/titanml-pod-template-v2.yaml > "$ROOT_DIR"/titanml-pod-runner.yaml
     kubectl apply -f "$ROOT_DIR"/titanml-pod-runner.yaml
     kubectl wait --for=condition=ready pod/titanml-pod
 
@@ -67,10 +69,11 @@ sed -e "s|{{UI_PORT}}|$UI_PORT|g" \
    -e "s|{{API_PORT}}|$API_PORT|g" \
    -e "s|{{API_HOST}}|$API_HOST|g" \
    -e "s|{{UI_IP}}|$UI_IP|g" \
-   -e "s|{{LOCAL_EMBED_CACHE}}|$EMBED_CACHE_HOST|g" \
+   -e "s|{{LOCAL_CHROMA_CACHE}}|$CHROMA_CACHE_HOST|g" \
    -e "s|{{LOCAL_VOLUME}}|$HOST_VOLUME|g" \
    -e "s|{{APP_PY_PATH}}|\"$APP_PY_PATH\"|g" \
-   "$ROOT_DIR"/ui-pod-template.yaml > "$ROOT_DIR"/ui-pod-runner.yaml
+   -e "s|{{EMB_PATH}}|\"$EMB_PATH\"|g" \
+   "$ROOT_DIR"/ui-pod-template-v2.yaml > "$ROOT_DIR"/ui-pod-runner.yaml
 kubectl apply -f "$ROOT_DIR"/ui-pod-runner.yaml
 kubectl wait --for=condition=ready pod/ui-pod
 

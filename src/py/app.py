@@ -4,11 +4,13 @@ import requests
 import os
 from chromadb.config import Settings
 from datetime import datetime
-    
+from chromadb.utils import embedding_functions
+
 api_host = os.environ.get("API_HOST")
 api_port = os.environ.get("API_PORT")
 RAG_DB_PATH=os.environ.get("DB_PATH")
-print(api_host,api_port,RAG_DB_PATH)
+EMB_PATH=os.environ.get("EMB_PATH")
+print(api_host,api_port,RAG_DB_PATH,EMB_PATH)
 #parser = argparse.ArgumentParser(description="Process a file.") 
 #path = '/mnt/efs/shared_fs/determined/rag_db/' 
 #db = chromadb.PersistentClient(path=path) 
@@ -28,7 +30,10 @@ path = RAG_DB_PATH
 settings = chromadb.get_settings()
 settings.allow_reset = True
 db = chromadb.PersistentClient(path=path,settings=settings)
-collection = db.get_collection("HPE_press_releases")
+emb_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
+    model_name=EMB_PATH, device="cpu"
+)
+collection = db.get_collection("HPE_press_releases",embedding_function=emb_fn)
 #parser.add_argument("filepath", help="Path to the XML file")
 titan_url = "http://{}:{}/generate_stream".format(api_host,api_port)
 print("Titan URL: ",titan_url)
