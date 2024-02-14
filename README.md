@@ -45,6 +45,9 @@ We use the following stack:
 
 
 # Detailed Installation Steps
+We will show how to (in detail) setup this repo and demo for a new environment. We are assuming to create shared directories for storing model files:
+* `/nvmefs1/test_user` and `/nvmefs1/test_user/cache`
+Please modify this to your respective environment.
 
 ## Steps to Complete:
 * Install Determined Notebook template to use all the required python libraries to run
@@ -59,7 +62,7 @@ Create directory: `mkdir -p /nvmefs1/test_user`
 ### Review Determined Notebook template: pdk-llm-nb-env-houston.yaml
 
 
-This is a configured template that mounts the host /nvmefs1 directory to the determined notebook and training job.
+This is a configured template that mounts the host `/nvmefs1` directory to the determined notebook and training job.
 You do not need to modify this file if you are running on houston.
 
 ### Install Determined Notebook template to use all the required python libraries to run
@@ -232,8 +235,11 @@ This notebook allows SE's to drive how to continuosly update a vector database w
 * **add_to_vector_db**: This runs `src/py/seed.py` that takes `hpe_press_releases.csv` as input and indexes it to the vector database. NOTE: We are persisting the vector db as a folder in the directory you created `/nvmefs1/test_user/cache/rag_db/`
 * **deploy**: This runs a runner script `src/scripts/generate_titanml_and_ui_pod_check.sh`. This script deploys the LLM located at `/nvmefs1/test_user/cache/model/mistral_7b_model_tokenizer` to TitanML. TitanML does some efficient optimization so that models only uses 8.4GB on a GPU. 
 
+### Can leave the **process_xml** pipline as is. 
+No need to modify, will support any environment
+
 ### Modify the **add_to_vector_db** pipline
-The **process_xml** pipeline does not have to be modified. We will need to modify the **add_to_vector_db** pipeline yaml definition.
+We will need to modify the **add_to_vector_db** pipeline yaml definition.
 
 In jupyter notebook cell, make sure you modify te --path-to-db to the correct location:
 ```yaml
@@ -250,7 +256,21 @@ transform:
 
 ### Modify the **src/scripts/generate_titanml_and_ui_pod_check.sh** script
 
-go to `src/scripts/deploy_app.sh` and modify several variables so it aligns with the current location of 
+go to `src/scripts/deploy_app.sh` and modify several variables:
+* `TITANML_POD_NAME`
+* `TITANML_CACHE_HOST`
+* `HOST_VOLUME`
+* `TAKEOFF_MODEL_NAME`
+* `DB_PATH`
+* `API_HOST`
+* `UI_IP`
+* `EMB_PATH`
+* `APP_PY_PATH`
+
+so it aligns with the current location of your shared directory:
+
+
+Here is an example
 ```bash
 # Environment variables
 ROOT_DIR=/pfs/code/src/scripts/ # ROOT_DIR is the directory where the scripts reside in /pfs
