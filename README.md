@@ -20,28 +20,49 @@ We use the following stack:
 * If you have a machine with GPUs, you can install PDK using this guide: https://github.com/interactivetech/pdk-install
 * [Coming soon] We will modify the installation steps to also support installation on a PDK GCP cluster
 
-# Steps to Complete:
+# Overview
+- [Quickstart Installation](#quickstart-installation)
+- [Location of pachyderm pipelines](#location-of-pachyderm-pipelines)
+- [Detailed Installation Steps](#detailed-installation-steps)
+- [Bring your own documents](#bring-your-own-documents)
+- [Bulid your own containers](#bulid-your-own-containers)
+- [Bring your own Huggingface model](#bring-your-own-huggingface-model)
+- [Bring your own Sentence Transformer model](#bring-your-own-sentence-transformer-model)
+
+# Quickstart Installation
+
+* Create new notebook on Houston using the `pdk-llm-rag-demo` template, you can select one gpu or no gpu.
+* In your `shared_nb/01 - Users/<USER_NAME>` create a terminal and run`git clone   https://interactivetech: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@github.com/interactivetech/pdk-llm-rag-demo-test-.git`
+* 
+
+# Location of pachyderm pipelines:
+* [deploy-rag](http://mldm-pachyderm.us.rdlabs.hpecorp.net/lineage/deploy-rag)
+* [deploy-rag-finetune](http://mldm-pachyderm.us.rdlabs.hpecorp.net/lineage/deploy-rag-finetune)
+
+## Notebooks to Run
+* Run `Deploy RAG with PDK.pynb` to deploy a RAG system using a pretrained LLM
+* Run `Finetune and Deploy RAG with PDK.ipynb` to both finetune an LLM and deploy a finetuned model.
+
+
+# Detailed Installation Steps
+
+## Steps to Complete:
 * Install Determined Notebook template to use all the required python libraries to run
 * Create Determined notebook
 * Setup directory of pretrained models and vectordb
 * Modify `Deploy RAG with PDK.ipynb` notebook
 
-# How to Run
-* Run `Deploy RAG with PDK.pynb` to deploy a RAG system using a pretrained LLM
-* Run `Finetune and Deploy RAG with PDK.ipynb` to both finetune an LLM and deploy a finetuned model.
-
-# Installation Steps
 Make sure you have a PDK deployment with a shared file directory `/nvmefs1/test_user` and `/nvmefs1/test_user/cache`
 
 Create directory: `mkdir -p /nvmefs1/test_user`
 
-# Review Determined Notebook template: pdk-llm-nb-env-houston.yaml
+### Review Determined Notebook template: pdk-llm-nb-env-houston.yaml
 
 
 This is a configured template that mounts the host /nvmefs1 directory to the determined notebook and training job.
 You do not need to modify this file if you are running on houston.
 
-## Install Determined Notebook template to use all the required python libraries to run
+### Install Determined Notebook template to use all the required python libraries to run
 NOTE: You do not need to run this step on houston, as the notebook template `pdk-llm-rag-demo` is already accessible
 change directory to the directory of this project, and run the command 
 
@@ -57,7 +78,7 @@ mkdir /run/determined/workdir/shared_fs/cache
 
 Create a notebook using the `pdk-llm-rag-demo` template.
 
-# Setup directory of pretrained models and vectordb
+## Setup directory of pretrained models and vectordb
 Make sure you have a PDK deployment with a shared file directory
 
 `mkdir -p /nvmefs1/test_user/cache`
@@ -88,15 +109,15 @@ Code to run to download vector db
 
 Code to run to download mistral 7B model
 
-`env/Download_Vector_Embedding.ipynb`
+`env/Download_and_cache_Mistral_7B_model.ipynb`
 
-# Get IPs to deploy RAG Application.
+## Get IPs to deploy RAG Application.
 
 We need two IP Addresses that will allocate on the Houston Kubernetes Cluster. One IP will be used to deploy the TitanML API Service, and the user will deploy the user interface.
 
 
 
-#### Get the first IP
+### Get the first IP
 you will need two dedicated IPs that can persist on the houston cluster. Here are the steps I recommend running to make sure you can get IPs to use for the cluster. 
 
 ```bash
@@ -144,7 +165,7 @@ jupyter1   LoadBalancer   10.43.186.18   10.182.1.51   8080:31685/TCP   5s
 
 We see that the ip address `10.182.1.51` is allocated, so save this IP address for the TitanML deployment. 
 
-#### Get the Second IP for the User Interface Pod
+### Get the Second IP for the User Interface Pod
 
 ```bash
 kubectl apply -f - <<EOF
@@ -229,38 +250,91 @@ transform:
 
 ### Modify the **src/scripts/generate_titanml_and_ui_pod_check.sh** script
 
-go to `src/scripts/deploy_app_v2.sh` and modify several variables so it aligns with the current location of 
+go to `src/scripts/deploy_app.sh` and modify several variables so it aligns with the current location of 
 ```bash
-ROOT_DIR=/pfs/code/src/scripts/
-# TITANML_POD_NAME is the name of the titanml pod we are deploying
-TITANML_POD_NAME=titanml-pod
-# TITANML_CACHE_HOST is the directory of the cache titanml needs during deployment
-TITANML_CACHE_HOST=/nvmefs1/test_user/cache/titanml_cache
-# HOST_VOLUME is the path to the root mounted directory
-HOST_VOLUME=/nvmefs1/
-# TAKEOFF_MODEL_NAME is the local path of a huggingface model titanml will optimize and deploy
-TAKEOFF_MODEL_NAME=/nvmefs1/andrew.mendez/mistral_instruct_model_and_tokenizer/
-# TAKEOFF_DEVICE specifys to use GPU Acceleration for TitanML
-TAKEOFF_DEVICE=cuda
+# Environment variables
+ROOT_DIR=/pfs/code/src/scripts/ # ROOT_DIR is the directory where the scripts reside in /pfs
+
+TITANML_POD_NAME=titanml-pod # TITANML_POD_NAME is the name of the titanml pod we are deploying
+
+TITANML_CACHE_HOST=/nvmefs1/test_user/cache/titanml_cache # TITANML_CACHE_HOST is the directory of the cache titanml needs during deployment
+
+HOST_VOLUME=/nvmefs1/ # HOST_VOLUME is the path to the root mounted directory
+
+TAKEOFF_MODEL_NAME=/nvmefs1/andrew.mendez/mistral_instruct_model_and_tokenizer/ # TAKEOFF_MODEL_NAME is the local path of a huggingface model titanml will optimize and deploy
+
+TAKEOFF_DEVICE=cuda # TAKEOFF_DEVICE specifys to use GPU Acceleration for TitanML
+
 API_PORT=8080
-API_HOST=10.182.1.48
+API_HOST=10.182.1.48 # This should update with the IP you verified
 UI_POD_NAME=ui-pod
 UI_PORT=8080
-# DB_PATH is the path to the chromadb vector database
-DB_PATH=/nvmefs1/test_user/cache/rag_db/
-UI_IP=10.182.1.50
+DB_PATH=/nvmefs1/test_user/cache/rag_db/ # DB_PATH is the path to the chromadb vector database
+
+UI_IP=10.182.1.5 0# This should update with the second IP you verified
 CHROMA_CACHE_HOST=/nvmefs1/andrew.mendez/chromadb_cache
 
-EMB_PATH=/nvmefs1/test_user/cache/vector_model/all-MiniLM-L6-v2
+EMB_PATH=/nvmefs1/test_user/cache/vector_model/e5-base-v2 
 # APP_PY_PATH is the python path used to the python script that implements the UI
 # Use /nvmefs1/ if you want fast debugging
 APP_PY_PATH="/nvmefs1/shared_nb/01 - Users/andrew.mendez/2024/pdk-llm-rag-demo-test-/src/py/app.py"
-# APP_PY_PATH="/pfs/out/app.py"
 ```
 
+You can run this as is, but if you want to deploy the TitanML API and the UI App on different IPS, change the `API_HOST` and the `UI_IP`
 
-Make sure in add_to_vector_db pipeline, 
---path_to_db /run/determined/workdir/shared_fs/cache/rag_db/
-and
---emb_model_path /run/determined/workdir/shared_fs/cache/vector_model/all-MiniLM-L6-v2'
-Is set correctly to the path of the rag_db
+# Bring your own documents
+
+[ToDo]
+
+# Bulid your own containers
+
+* Docker container for notebok environment: mendeza/mistral-rag-env:0.0.11-pachctl
+Can build a similar container using:
+```bash
+FROM determinedai/environments:cuda-11.3-pytorch-1.12-tf-2.11-gpu-mpi-0.27.1
+RUN pip install transformers==4.36.0
+RUN pip install peft accelerate bitsandbytes trl
+RUN pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu117
+RUN pip install einops
+RUN curl -L https://github.com/pachyderm/pachyderm/releases/download/v2.8.2/pachctl_2.8.2_linux_amd64.tar.gz | sudo tar -xzv --strip-components=1 -C /usr/local/bin
+```
+* Docker container for TitanML Serving appllication: mendeza/takeoff-mistral:0.5
+    * To build a new `mendeza/takeoff-mistral` look at this [repo](https://github.com/interactivetech/takeoff-community) that includes:
+        * the [Dockerfile](https://github.com/interactivetech/takeoff-community/blob/main/Dockerfile) 
+        * and [build_container.sh](https://github.com/interactivetech/takeoff-community/blob/main/build_container.sh)
+* Docker container for User Interface Chainlit app: mendeza/mistral-llm-rag-ui:0.0.7
+```bash
+FROM determinedai/environments:cuda-11.3-pytorch-1.12-tf-2.11-gpu-mpi-0.27.1
+RUN pip install transformers==4.36.0
+RUN pip install peft accelerate bitsandbytes trl
+RUN pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu117
+RUN pip install einops chainlit==0.7.700 sentence_transformers==2.2.2 sentencepiece==0.1.99
+RUN curl -L https://github.com/pachyderm/pachyderm/releases/download/v2.8.2/pachctl_2.8.2_linux_amd64.tar.gz | sudo tar -xzv --strip-components=1 -C /usr/local/bin
+```
+* Docker container for PyTorchTrial Mistal finetuning: mendeza/mistral-rag-env:0.0.11-pachctl
+    * Can build the same container using the instructions from mendeza/mistral-rag-env:0.0.11-pachctl
+
+
+# Bring your own Huggingface model
+
+Create a new folder for the new LLM Model and Tokenizer
+
+` mkdir -p  /nvmefs1/test_user/cache/model/mistral_7b_model_tokenizer2`
+
+To prevent any interruption downloading, we will create a separate cache folder when first downloading the model
+(We can delete this after successfully saving)
+` mkdir -p  /nvmefs1/test_user/cache/model_cache/mistral_7b_model_tokenizer2`
+
+Follow the notebook `env/Download_and_cache_Mistral_7B_model.ipynb` and modify the path to save model at `/nvmefs1/test_user/cache/model/mistral_7b_model_tokenizer2` and the cache_dir `  /nvmefs1/test_user/cache/model_cache/mistral_7b_model_tokenizer2`
+
+You will need to modify the `TAKEOFF_MODEL_NAME` in `src/scripts/deploy_app.sh` that points to the new local HF model
+
+# Bring your own Sentence Transformer model
+
+Create a new folder for the new Embedding Model
+
+` mkdir -p  /nvmefs1/test_user/cache/vector_model/all-MiniLM-L6-v22`
+
+Follow the notebook `env/Download_Vector_Embedding.ipynb` and modify the path to save model at `/nvmefs1/test_user/cache/vector_model/all-MiniLM-L6-v22`
+
+You will need to modify the `EMB_PATH` in `src/scripts/deploy_app.sh` that points to the new local HF model

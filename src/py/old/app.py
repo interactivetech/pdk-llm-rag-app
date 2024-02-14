@@ -68,9 +68,7 @@ async def main(message: cl.Message):
     # Print the result
     print("Sorted Dates:", sorted_dates)
     print("Original Indices:", original_indices)
-    results_x = [results["documents"][0][original_indices[0]],
-                 results["documents"][0][original_indices[1]],
-                 results["documents"][0][original_indices[2]]]# get the first three document
+    results = [results["documents"][0][original_indices[0]]]# get the first document
     await show_sources(results)
     # print("results: ",results)`
     '''
@@ -78,15 +76,15 @@ async def main(message: cl.Message):
     This assumes TitanML API deployed on A100
     This will decrease when API is deployed no T4.
     '''
-    results2 = "\n".join(results_x)
-    results2 = results2[:4500]
+    results2 = "\n\n".join(results)
+    results2 = results2[:8500]
     print("len(results2): ",len(results2))
     print("results2: ",results2)
-    prompt = f"[INST]`{results2}`. Using the above information, answer the following question: {message.content}.Answer factually and concisely, answer at most in three sentences. Respond in a natural way, like you are having a conversation with a friend.[/INST]"
+    prompt = f"[INST]`{results2}`. Using the above information, answer the following question: {message.content}. Answer concisely at most in three sentences. Respond in a natural way, like you are having a conversation with a friend.[/INST]"
     print("=========prompt=============: ")
     print(prompt)
     print("=========end_of_prompt=============")
-    params={ 'generate_max_length': 1000,
+    params={ 'generate_max_length': 300,
         'no_repeat_ngram_size': 0,
         'sampling_topk': 50,
         'sampling_topp': 0.95,

@@ -1,28 +1,30 @@
 #!/bin/bash
 
 # Environment variables
-# ROOT_DIR is the directory where the scripts reside in /pfs
-ROOT_DIR=/pfs/code/src/scripts/
-# TITANML_POD_NAME is the name of the titanml pod we are deploying
-TITANML_POD_NAME=titanml-pod
-# TITANML_CACHE_HOST is the directory of the cache titanml needs during deployment
-TITANML_CACHE_HOST=/nvmefs1/test_user/cache/titanml_cache
-# HOST_VOLUME is the path to the root mounted directory
-HOST_VOLUME=/nvmefs1/
-# TAKEOFF_MODEL_NAME is the local path of a huggingface model titanml will optimize and deploy
-TAKEOFF_MODEL_NAME=/nvmefs1/andrew.mendez/mistral_instruct_model_and_tokenizer/
-# TAKEOFF_DEVICE specifys to use GPU Acceleration for TitanML
-TAKEOFF_DEVICE=cuda
+ROOT_DIR=/pfs/code/src/scripts/ # ROOT_DIR is the directory where the scripts reside in /pfs
+
+TITANML_POD_NAME=titanml-pod # TITANML_POD_NAME is the name of the titanml pod we are deploying
+
+TITANML_CACHE_HOST=/nvmefs1/test_user/cache/titanml_cache # TITANML_CACHE_HOST is the directory of the cache titanml needs during deployment
+
+HOST_VOLUME=/nvmefs1/ # HOST_VOLUME is the path to the root mounted directory
+
+TAKEOFF_MODEL_NAME=/nvmefs1/andrew.mendez/mistral_instruct_model_and_tokenizer/ # TAKEOFF_MODEL_NAME is the local path of a huggingface model titanml will optimize and deploy
+
+TAKEOFF_DEVICE=cuda # TAKEOFF_DEVICE specifys to use GPU Acceleration for TitanML
+
 API_PORT=8080
 API_HOST=10.182.1.48
 UI_POD_NAME=ui-pod
 UI_PORT=8080
-# DB_PATH is the path to the chromadb vector database
-DB_PATH=/nvmefs1/test_user/cache/rag_db/
+DB_PATH=/nvmefs1/test_user/cache/rag_db/ # DB_PATH is the path to the chromadb vector database
+
 UI_IP=10.182.1.50
 CHROMA_CACHE_HOST=/nvmefs1/andrew.mendez/chromadb_cache
 
-EMB_PATH=/nvmefs1/andrew.mendez/chromadb_cache/all-MiniLM-L6-v2
+# EMB_PATH=/nvmefs1/andrew.mendez/chromadb_cache/all-MiniLM-L6-v2
+# EMB_PATH=/nvmefs1/test_user/cache/vector_model/e5-mistral-7b-instruct
+EMB_PATH=/nvmefs1/test_user/cache/vector_model/e5-base-v2 
 # APP_PY_PATH is the python path used to the python script that implements the UI
 # Use /nvmefs1/ if you want fast debugging
 APP_PY_PATH="/nvmefs1/shared_nb/01 - Users/andrew.mendez/2024/pdk-llm-rag-demo-test-/src/py/app.py"
