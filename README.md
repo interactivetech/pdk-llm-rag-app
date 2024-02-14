@@ -32,7 +32,7 @@ We use the following stack:
 # Quickstart Installation
 
 * Create new notebook on Houston using the `pdk-llm-rag-demo` template, you can select one gpu or no gpu.
-* In your `shared_nb/01 - Users/<USER_NAME>` create a terminal and run`git clone   https://interactivetech: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@github.com/interactivetech/pdk-llm-rag-demo-test-.git`
+* In your `shared_nb/01 - Users/<USER_NAME>` create a terminal and run`git clone ttps://github.com/interactivetech/pdk-llm-rag-demo-test-.git`
 * 
 
 # Location of pachyderm pipelines:
