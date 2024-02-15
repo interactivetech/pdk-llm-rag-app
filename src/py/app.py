@@ -90,9 +90,7 @@ async def main(message: cl.Message):
     # Print the result
     print("Sorted Dates:", sorted_dates)
     print("Original Indices:", original_indices)
-    results_x = [results["documents"][0][original_indices[0]],
-                 results["documents"][0][original_indices[1]],
-                 results["documents"][0][original_indices[2]]]# get the first three document
+    results_x = [results["documents"][0][original_indices[0]]]# get the first two document
     await show_sources(results)
     # print("results: ",results)`
     '''

@@ -34,7 +34,13 @@ We use the following technologies to implement the RAG System:
 
 * Create new notebook on the Houston cluster using the `pdk-llm-rag-demo` template, you can select one gpu or no gpu.
 * In your `shared_nb/01 - Users/<USER_NAME>` create a terminal and run`git clone ttps://github.com/interactivetech/pdk-llm-rag-demo-test-.git`
+
 * Open the `Deploy RAG with PDK.pynb`, and it should run out-of-the-box.
+* Note: The default to deploy the TitanML pod is using an A100 (using the taint `A100-MLDM`), if you want to change this to deploy to a T4, do the following:
+    * go to `src/scripts/deploy_app.sh`
+    GPU_DEVICE=A100-MLDM
+    * update # GPU_DEVICE=Tesla-T4
+
 
 # Location of pachyderm pipelines:
 * [deploy-rag](http://mldm-pachyderm.us.rdlabs.hpecorp.net/lineage/deploy-rag)
