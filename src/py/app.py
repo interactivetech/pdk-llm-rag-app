@@ -6,6 +6,28 @@ from chromadb.config import Settings
 from datetime import datetime
 from chromadb.utils import embedding_functions
 
+class ConversationQueue:
+    def __init__(self, max_length=3):
+        self.queue = []
+        self.max_length = max_length
+
+    def add_conversation(self, question, response=None):
+        if response:
+            conversation = f'[INST] {question} [/INST] "{response}"'
+        else:
+            conversation = f'[INST] {question} [/INST] '
+        if len(self.queue) == self.max_length:
+            self.queue.pop(0)
+        self.queue.append(conversation)
+
+    def get_conversations(self):
+        return ''.join(self.queue)
+
+    def generate_prompt(self, doc, query):
+        base_prompt = self.get_conversations()
+        prompt = f"{base_prompt}[INST]Document:`{doc}`. Using the text in Document, answer the following question factually: {query}. Answer concisely at most in three sentences. Respond in a natural way, like you are having a conversation with a friend.[/INST]"
+        return prompt
+    
 api_host = os.environ.get("API_HOST")
 api_port = os.environ.get("API_PORT")
 RAG_DB_PATH=os.environ.get("DB_PATH")
