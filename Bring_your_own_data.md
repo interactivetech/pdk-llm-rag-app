@@ -19,7 +19,7 @@ from fpdf import FPDF
 import csv
 
 # Define the CSV file name
-csv_file = '../data/HPE_2023_Press_Releases.csv'
+csv_file = 'nutrition_content.csv'
 
 # Create a PDF class instance
 class PDF(FPDF):
