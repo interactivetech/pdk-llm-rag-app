@@ -304,7 +304,7 @@ You can run this as is, but if you want to deploy the TitanML API and the UI App
 
 # Bring your own documents
 
-Follow the [Bring_your_own_data.md](bring_your_own_data.md)
+Follow the [Bring_your_own_data.md](Bring_your_own_data.md)
 
 # Bulid your own containers
 
