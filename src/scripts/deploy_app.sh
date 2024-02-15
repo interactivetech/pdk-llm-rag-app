@@ -17,9 +17,9 @@ API_PORT=8080
 API_HOST=10.182.1.48
 UI_POD_NAME=ui-pod
 UI_PORT=8080
-DB_PATH=/nvmefs1/test_user/cache/rag_db/ # DB_PATH is the path to the chromadb vector database
+DB_PATH=/nvmefs1/test_user/cache/rag_db3 # DB_PATH is the path to the chromadb vector database
 
-UI_IP=10.182.1.50
+UI_IP=10.182.1.51
 CHROMA_CACHE_HOST=/nvmefs1/andrew.mendez/chromadb_cache
 
 # EMB_PATH=/nvmefs1/andrew.mendez/chromadb_cache/all-MiniLM-L6-v2

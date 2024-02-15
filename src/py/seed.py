@@ -41,38 +41,38 @@ def main(csv_path,path_to_db):
     #print("Model saved at:{} ".format(model_path))
     collection = db.create_collection(name="HPE_press_releases", embedding_function=emb_fn)
 
+    # data_path = csv_path
+    # df = pd.read_csv(data_path)
+    # LEN=df.shape[0]
+    # collection.add(
+    #     documents=[df.iloc[i]['Content'] for i in range(LEN)],
+    #     metadatas=[{'Title':df.iloc[i]['Title'],'Content':df.iloc[i]['Content'],'Date':df.iloc[i]['Date']} for i in range(LEN)],
+    #     ids=[f'id{str(i)}' for i in range(LEN)]
+    # )
+    '''Chunking strategy'''
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=8000, chunk_overlap=100)
+    def chunk_text(text_splitter,text):
+        return text_splitter.split_text(text)
+
     data_path = csv_path
     df = pd.read_csv(data_path)
     LEN=df.shape[0]
-    collection.add(
-        documents=[df.iloc[i]['Content'] for i in range(LEN)],
-        metadatas=[{'Title':df.iloc[i]['Title'],'Content':df.iloc[i]['Content'],'Date':df.iloc[i]['Date']} for i in range(LEN)],
-        ids=[f'id{str(i)}' for i in range(LEN)]
-    )
-'''Chunking strategy
-    # text_splitter = RecursiveCharacterTextSplitter(chunk_size=8000, chunk_overlap=100)
-    # def chunk_text(text_splitter,text):
-    #     return text_splitter.split_text(text)
+    chunks = []
+    inds = []
+    print("Number of docs: ",LEN)
+    for i in tqdm(range(LEN)):
+        ch = chunk_text(text_splitter,df.iloc[i]['Content'])
+        chunks+=ch
+        inds+=[i]*len(ch)
+    print("Number of chunks: ",len(chunks))
 
-#     data_path = csv_path
-#     df = pd.read_csv(data_path)
-#     LEN=df.shape[0]
-#     chunks = []
-#     inds = []
-#     print("Number of docs: ",LEN)
-#     for i in tqdm(range(LEN)):
-#         ch = chunk_text(text_splitter,df.iloc[i]['Content'])
-#         chunks+=ch
-#         inds+=[i]*len(ch)
-#     print("Number of chunks: ",len(chunks))
+    for i in tqdm(range(len(chunks))):
+        collection.add(
+            documents=[chunks[i]],
+            metadatas=[{'Title':df.iloc[inds[i]]['Title'],'Content':df.iloc[inds[i]]['Content'],'Date':df.iloc[inds[i]]['Date']}],
+            ids=[f'id{str(i)}']
+        )
 
-#     for i in tqdm(range(len(chunks))):
-#         collection.add(
-#             documents=[chunks[i]],
-#             metadatas=[{'Title':df.iloc[inds[i]]['Title'],'Content':df.iloc[inds[i]]['Content'],'Date':df.iloc[inds[i]]['Date']}],
-#             ids=[f'id{str(i)}']
-#         )
-'''
     query = "How were HPE's earnings in 2022?"
     results = collection.query(query_texts=[query], n_results=5)
     print("query: ",query, "results: ",results['documents'])

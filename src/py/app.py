@@ -79,7 +79,7 @@ async def main(message: cl.Message):
     This will decrease when API is deployed no T4.
     '''
     results2 = "\n".join(results_x)
-    results2 = results2[:4500]
+    results2 = results2[:8500]
     print("len(results2): ",len(results2))
     print("results2: ",results2)
     prompt = f"[INST]`{results2}`. Using the above information, answer the following question: {message.content}.Answer factually and concisely, answer at most in three sentences. Respond in a natural way, like you are having a conversation with a friend.[/INST]"
