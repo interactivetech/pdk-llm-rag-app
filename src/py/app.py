@@ -60,6 +60,9 @@ collection = db.get_collection("HPE_press_releases",embedding_function=emb_fn)
 titan_url = "http://{}:{}/generate_stream".format(api_host,api_port)
 print("Titan URL: ",titan_url)
 
+# Example usage
+cq = ConversationQueue()
+print("Initialized Conversation History Queue...")
 @cl.on_message  # this function will be called every time a user inputs a message in the UI
 async def main(message: cl.Message):
     # Send the final answer.
@@ -102,7 +105,14 @@ async def main(message: cl.Message):
     results2 = results2[:8500]
     print("len(results2): ",len(results2))
     print("results2: ",results2)
-    prompt = f"[INST]`{results2}`. Using the above information, answer the following question: {message.content}.Answer factually and concisely, answer at most in three sentences. Respond in a natural way, like you are having a conversation with a friend.[/INST]"
+
+    # question = "What is a healthy condiment?!"
+    # print("question: ",question)
+    # Adding first conversation
+    prompt = cq.generate_prompt(
+        results2,
+        message.content)
+    # prompt = f"[INST]`{results2}`. Using the above information, answer the following question: {message.content}.Answer factually and concisely, answer at most in three sentences. Respond in a natural way, like you are having a conversation with a friend.[/INST]"
     print("=========prompt=============: ")
     print(prompt)
     print("=========end_of_prompt=============")
@@ -116,7 +126,11 @@ async def main(message: cl.Message):
             **params}
     response = requests.post(titan_url, json=json, stream=True)
     response.encoding = "utf-8"
-    print("response: ", response.content)
+    print("response: ", response.content.decode('utf-8'))
+    answer = response.content.decode('utf-8')
+    print("Adding answer to conversation history...")
+
+    cq.add_conversation(message.content, answer)
     for text in response.iter_content(chunk_size=1, decode_unicode=True):
         await msg.stream_token(text)
 
