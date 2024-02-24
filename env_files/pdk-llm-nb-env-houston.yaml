@@ -17,9 +17,9 @@ environment:
   environment_variables: {}
   force_pull_image: false
   image:
-    cpu: mendeza/mistral-rag-env:0.0.11-pachctl
-    cuda: mendeza/mistral-rag-env:0.0.11-pachctl
-    rocm: mendeza/mistral-rag-env:0.0.11-pachctl
+    cpu:  mendeza/mistral-rag-env:0.0.11-pachctl-2.9.0
+    cuda: mendeza/mistral-rag-env:0.0.11-pachctl-2.9.0
+    rocm: mendeza/mistral-rag-env:0.0.11-pachctl-2.9.0
   pod_spec:
     apiVersion: v1
     kind: Pod
